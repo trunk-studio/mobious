@@ -28,15 +28,23 @@ passport.use(new FacebookStrategy({
 ));
 
 var LocalStrategy = require('passport-local').Strategy
-passport.use(new LocalStrategy(function(username, password, done) {
-  // 這邊需要改寫成直接使用  orm 處理
-  console.log("==== passport LocalStrategy ====");
+passport.use(new LocalStrategy(async (username, password, done) => {
+  let loginInfo = {
+    where: {username, password},
+    include: [models.Role]
+  };
+  try {
+    let logedUser = (await models.User.findOne(loginInfo)).dataValues;
 
-  console.log("=== username ===", username);
-  console.log("=== password ===", password);
-  if (username === 'test' && password === 'test') {
-    done(null, user)
-  } else {
-    done(null, false)
+    console.log('logedUser', logedUser);
+
+    if (logedUser) {
+      done(null, logedUser)
+    } else {
+      done(null, false);
+    }
+  } catch (e) {
+    console.log(e);
+    done(null, false);
   }
 }));
