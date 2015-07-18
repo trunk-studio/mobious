@@ -59,7 +59,7 @@ export default {
           loader: 'json'
         },
         {
-          test: /\.(jpe?g|png|gif|svg|woff|eot|ttf)$/,
+          test: /\.(jpe?g|png|gif|svg|woff|woff2|eot|ttf)$/,
           loader: 'url?limit=10000&name=[sha512:hash:base64:7].[ext]'
         },
         {
@@ -68,7 +68,7 @@ export default {
           loaders: ['react-hot', 'babel']
         },
         {
-          test: /\.scss$/,
+          test: /\.scss|.css$/,
           loader: 'style!css?sourceMap!autoprefixer?browsers=last 2 version!sass?outputStyle=expanded&sourceMap'
         }
       ]
