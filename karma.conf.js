@@ -21,15 +21,11 @@ else {
 
 module.exports = function (config) {
   config.set({
-    browsers: [process.env.CONTINUOUS_INTEGRATION ? 'Firefox' : 'Chrome'],
+    browsers: ['Firefox'],
     browserNoActivityTimeout: 30000,
-    frameworks: ['mocha'],
-    files: [
-      'tests.webpack.js'
-    ],
-    preprocessors: {
-      'tests.webpack.js': ['webpack', 'sourcemap']
-    },
+    frameworks: ['mocha', 'chai', 'sinon-chai'],
+    files: ['tests.webpack.js'],
+    preprocessors: {'tests.webpack.js': ['webpack', 'sourcemap']},
     reporters: reporters,
     coverageReporter: coverage,
     webpack: {
@@ -45,15 +41,15 @@ module.exports = function (config) {
           },
           {
             test: /\.js$|.jsx$/,
-            loader: 'isparta?{babel: {stage: 1}}',
+            loader: 'isparta?{babel: {stage: 0}}',
             exclude: /node_modules|test/
           },
           {
-            test: /\.scss$/,
+            test: /\.scss|.css$/,
             loader: 'style!css!sass'
           },
           {
-            test: /\.(jpe?g|png|gif|svg|woff|eot|ttf)$/,
+            test: /\.(jpe?g|png|gif|svg|woff|woff2|eot|ttf)$/,
             loader: 'file?name=[sha512:hash:base64:7].[ext]'
           },
           {

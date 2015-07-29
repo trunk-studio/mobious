@@ -1,5 +1,9 @@
+/* eslint-disable */
+
 import React, {Component, PropTypes} from 'react';
+import {Link} from 'react-router';
 import {IntlMixin} from 'react-intl';
+import {Button, Table, Panel, Col} from 'react-bootstrap';
 
 if (process.env.BROWSER) {
   require('userManager/styles/users.scss');
@@ -7,19 +11,20 @@ if (process.env.BROWSER) {
 
 class Users extends Component {
 
-  static contextTypes = {
-    router: PropTypes.func
-  }
-
   static propTypes = {
-    flux: React.PropTypes.object.isRequired
+    flux: PropTypes.object.isRequired
   }
 
   _getIntlMessage = IntlMixin.getIntlMessage
 
-  state = this.props.flux
+  state = {
+    users: this.props.flux
     .getStore('users')
-    .getState();
+    .getState().users,
+    authStatus: this.props.flux
+    .getStore('auth')
+    .getState().authStatus
+  };
 
   componentWillMount() {
     this.props.flux
@@ -41,84 +46,79 @@ class Users extends Component {
     this.props.flux
       .getStore('users')
       .unlisten(this._handleStoreChange);
+
   }
 
-  _handleStoreChange = this._handleStoreChange.bind(this)
-  _handleStoreChange(state: Object) {
+  _handleStoreChange = (state) => {
+    state.authStatus = this.props.flux.getStore('auth').getState().authStatus
     return this.setState(state);
   }
 
-  _removeUser(id: number) {
+  _removeUser(id) {
     this.props.flux
       .getActions('users')
       .remove(id);
   }
 
-  _showProfile(id: string) {
-    this.context.router
-      .transitionTo('profile', {id});
-  }
-
-  _showCreateForm() {
-    this.context.router
-      .transitionTo('userCreate');
-  }
-
-  _renderUsers() {
-    return this.state.users.map((user, index) => {
-      return (
-        <tr className='user--row' key={index}>
-          <td>{user.email}</td>
-          <td className='text-center'>
-            <button
-              onClick={this._showProfile.bind(this, user.id)}>
-              Profile
-            </button>
-          </td>
-          <td className='text-center'>
-            <button
-              className='user--remove'
-              onClick={this._removeUser.bind(this, user.id)}>
-              X
-            </button>
-          </td>
-        </tr>
-      );
-    });
+  renderUser = (user, index) => {
+    return (
+      <tr className='user--row' key={index}>
+        <td>{user.email}</td>
+        <td>
+          <Link to={`/profile/${user.id}`}>
+            <Button>Profile</Button>
+          </Link>
+          {() => {
+            if (this.state.authStatus.authority === 'admin') {
+              return (
+                <Button bsStyle='danger' bsSize='small' className='user-remove'
+                  onClick={this._removeUser.bind(this, user.id)}>
+                  X
+                </Button>
+              )
+            }
+          }()}
+        </td>
+      </tr>
+    );
   }
 
   render() {
     return (
-      <div>
-        <h1 className='text-center'>
-          {this._getIntlMessage('userManager.title')}
-        </h1>
-        <table className='app--users'>
-          <thead>
-            <tr>
-              <th>
-                {this._getIntlMessage('userManager.email')}
-              </th>
-              <th colSpan='2'>
-                {this._getIntlMessage('userManager.actions')}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {this._renderUsers()}
-          </tbody>
-        </table>
-        <p className='text-center'>
-          <button
-            ref='add-button'
-            onClick={this._showCreateForm.bind(this)}>
-            {this._getIntlMessage('userManager.add')}
-          </button>
-        </p>
-      </div>
+      <Col md={6} mdOffset={3} sm={8} smOffset={2} xs={12}>
+        <Panel className="app-users"
+          header={<h3>{this._getIntlMessage('userManager.title')}</h3>}
+          footer={() => {
+            if (this.state.authStatus.authority === 'admin') {
+              return (
+                <Link to='/userCreate'>
+                  <Button bsStyle='success'>
+                    {this._getIntlMessage('userManager.add')}
+                  </Button>
+                </Link>
+              )
+            }
+          }()}
+        >
+          <Table responsive>
+            <thead>
+              <tr>
+                <th>
+                  {this._getIntlMessage('userManager.email')}
+                </th>
+                <th colSpan='2'>
+                  {this._getIntlMessage('userManager.actions')}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.users.map(this.renderUser)}
+            </tbody>
+          </Table>
+        </Panel>
+      </Col>
     );
   }
-
 }
 
 export default Users;

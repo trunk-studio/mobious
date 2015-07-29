@@ -1,4 +1,3 @@
-import chai from 'chai';
 import React from 'react/addons';
 import Flux from 'utils/flux';
 import objectAssign from 'react/lib/Object.assign';
@@ -27,18 +26,20 @@ describe('Header', () => {
   });
 
   afterEach(() => {
-    if (instance && instance.isMounted()) {
-      React.unmountComponentAtNode(node);
-    }
-  });
-
-  it('should render links correctly', () => {
-    const links = TestUtils.findRenderedDOMComponentWithClass(instance, 'app--navbar');
-    links.props.children.length.should.eql(3);
+    if (instance) React.unmountComponentAtNode(node);
   });
 
   it('should render lang picker correctly', () => {
     const langs = TestUtils.findRenderedDOMComponentWithClass(instance, 'lang--picker');
     langs.props.children.length.should.eql(2);
+  });
+
+  it('should handle requests change', function() {
+    flux.getActions('requests').start();
+    const spinner = TestUtils.findRenderedDOMComponentWithClass(instance, 'app--spinner');
+    spinner.props.className.indexOf('active').should.not.eql(-1);
+
+    flux.getActions('requests').fail();
+    spinner.props.className.indexOf('active').should.eql(-1);
   });
 });

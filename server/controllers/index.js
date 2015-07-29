@@ -3,6 +3,7 @@ import UserController from './user';
 import BeanController from './bean';
 import PostController from './post';
 import AuthController from './auth';
+import CommentController from './comment';
 
 import Router from 'koa-router';
 import fs from 'fs';
@@ -39,7 +40,7 @@ export default class Routes {
       })
 
       publicRoute.post('/auth/login', function*(next) {
-        let ctx = this
+        let ctx = this;
         yield passport.authenticate('local', function*(err, user, info) {
           if (err) throw err
           if (user === false) {
@@ -47,7 +48,8 @@ export default class Routes {
             ctx.body = { success: false }
           } else {
             yield ctx.logIn(user);
-            ctx.body = { success: true }
+            let authStatus = services.user.getAuthStatus(ctx);
+            ctx.body = authStatus
           }
         }).call(this, next)
       });
@@ -75,8 +77,11 @@ export default class Routes {
       publicRoute.get('/rest/user/', UserController.index);
       publicRoute.get('/rest/bean/', BeanController.index);
       publicRoute.get('/rest/post/', PostController.index);
+      publicRoute.get('/rest/comment/', CommentController.index);
       publicRoute.get('/rest/post/:id', PostController.get);
       publicRoute.get('/rest/auth/status', AuthController.status);
+
+      publicRoute.post('/rest/comment/', CommentController.create);
 
 
       app.use(publicRoute.middleware())

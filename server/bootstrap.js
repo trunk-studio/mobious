@@ -70,7 +70,7 @@ export default async (cb) => {
     thumbCoverUrl: ''
   }
 
-  let testPost = {
+  let testPost1 = {
     title: '這是一篇文章',
     tags: '西捨',
     content: '西捨帥帥'
@@ -82,6 +82,20 @@ export default async (cb) => {
     content: '蹤影帥帥'
   }
 
+  let Comment1 = {
+    author: '西捨',
+    content: '我也這麼認為'
+  }
+
+  let Comment2 = {
+    author: 'Rick',
+    content: '感謝大大無私分享'
+  }
+
+  let Comment3 = {
+    author: '是叉貓',
+    content: '肥宅4ni'
+  }
 
   let adminRole = {
     authority: 'admin'
@@ -103,10 +117,16 @@ export default async (cb) => {
     await createdEditor.setRoles(createdEditorRole);
     await createdAdmin.setRoles(createdAdminRole);
 
-    await models.Bean.create(newBeanBlack)
-    await models.Bean.create(newBeanWhite)
-    await models.Post.create(testPost)
-    await models.Post.create(testPost2)
+    await models.Bean.create(newBeanBlack);
+    await models.Bean.create(newBeanWhite);
+
+    let createdPost1 = await models.Post.create(testPost1);
+    let createdPost2 = await models.Post.create(testPost2);
+
+    let createdCom1 = await models.Comment.create(Comment1);
+    let createdCom2 = await models.Comment.create(Comment2);
+    let createdCom3 = await models.Comment.create(Comment3);
+
 
   } catch (e) {
 

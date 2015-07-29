@@ -1,39 +1,52 @@
 import React from 'react';
-import {Route, DefaultRoute, NotFoundRoute} from 'react-router';
+import {Route} from 'react-router';
+import {generateRoute} from 'utils/localized-routes';
+// import requireAuth from 'components/shared/require-auth';
+// let protectedPage = require('./components/protected');
+// const decorated = requireAuth('admin', protectedPage);
 
 export default (
-  <Route name='app' path='/' handler={require('./components/app')}>
-    <DefaultRoute
-      name='users'
-      handler={require('./userManager/components/users')} />
-    <Route
-      name='guides'
-      handler={require('./components/guides')} />
-    <Route
-      name='protected'
-      handler={require('./components/protected')} />
-    <Route
-      name='profile'
-      path='profile/:id'
-      handler={require('./userManager/components/profile')} />
-    <Route
-      name='login-info'
-      path='login-info/:nextPath'
-      handler={require('./pages/login-info')} />
-    <Route
-      name='beanList'
-      handler={require(`./beanManager/components/list`)} />
-    <Route
-      name='postList'
-      handler={require(`./postManager/components/list`)} />
-    <Route
-      name='postOne'
-      path='/post/:id'
-      handler={require(`./postManager/components/single`)} />
-    <Route
-      name='userCreate'
-      handler={require('./userManager/components/create')} />
-
-    <NotFoundRoute handler={require('./pages/not-found')} />
+  <Route component={require('./components/app')}>
+    {generateRoute({
+      paths: ['/', '/users'],
+      component: require('./userManager/components/users')
+    })}
+    {generateRoute({
+      paths: ['/guides'],
+      component: require('./components/guides')
+    })}
+    {generateRoute({
+      paths: ['/protected'],
+      component: require('./components/protected')
+    })}
+    {generateRoute({
+      paths: ['/profile/:id'],
+      component: require('./userManager/components/profile')
+    })}
+    {generateRoute({
+      paths: ['/login-info'],
+      component: require('./pages/login-info')
+    })}
+    {generateRoute({
+      paths: ['/beanList'],
+      component: require('./beanManager/components/list')
+    })}
+    {generateRoute({
+      paths: ['postList'],
+      component: require('./postManager/components/list')
+    })}
+    {generateRoute({
+      paths: ['/postOne/:id'],
+      component: require('./postManager/components/single')
+    })}
+    {generateRoute({
+      paths: ['/userCreate'],
+      component: require('./userManager/components/create')
+    })}
+    {generateRoute({
+      paths: ['/commentList'],
+      component: require('./commentManager/components/list')
+    })}
+    <Route path='*' component={require('./pages/not-found')} />
   </Route>
 );
